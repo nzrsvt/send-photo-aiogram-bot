@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 def connect_db():
     conn = sqlite3.connect('database.db')
@@ -66,3 +67,31 @@ def check_user_existence(user_id):
     conn.close()
 
     return user_data is not None
+
+def check_user_photo_existence(user_id):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT photo_path FROM users WHERE user_id = ?', (user_id,))
+    photo_path = cur.fetchone()
+
+    conn.close()
+
+    return photo_path is not None
+
+def delete_user_photo(user_id):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT photo_path FROM users WHERE user_id = ?', (user_id,))
+    photo_path = cur.fetchone()
+
+    if photo_path:
+        try:
+            os.remove(str(photo_path[0]))
+        except FileNotFoundError:
+            pass  
+
+        cur.execute('UPDATE users SET photo_path = NULL WHERE user_id = ?', (user_id,))
+
+        conn.commit()
+
+    conn.close()
