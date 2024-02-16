@@ -13,7 +13,9 @@ def create_users_table():
             id INTEGER PRIMARY KEY,
             user_id INTEGER NOT NULL,
             username TEXT,
-            full_name TEXT
+            full_name TEXT,
+            photo_path TEXT,
+            instagram_nickname TEXT
         )
     ''')
 
@@ -31,6 +33,30 @@ def add_user(user_id, username, full_name):
     conn.commit()
     conn.close()
 
+def update_user_photo_path(user_id, photo_path):
+    conn, cur = connect_db()
+
+    cur.execute('''
+        UPDATE users
+        SET photo_path = ?
+        WHERE user_id = ?
+    ''', (photo_path, user_id))
+
+    conn.commit()
+    conn.close()
+
+def update_user_nickname(user_id, instagram_nickname):
+    conn, cur = connect_db()
+
+    cur.execute('''
+        UPDATE users
+        SET instagram_nickname = ?
+        WHERE user_id = ?
+    ''', (instagram_nickname, user_id))
+
+    conn.commit()
+    conn.close()
+
 def check_user_existence(user_id):
     conn, cur = connect_db()
 
@@ -41,3 +67,6 @@ def check_user_existence(user_id):
 
     return user_data is not None
 
+async def handle_user_sending(state):
+    async with state.proxy() as data:
+        print(data['photo'])
