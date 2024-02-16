@@ -31,7 +31,7 @@ async def process_photo(message: types.Message, state: FSMContext):
 async def process_nickname(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
             data['nickname'] = message.text
-    await db.handle_user_sending(state)
+    await handle_user_sending(state, message.chat.id)
     await state.finish()
     await message.answer(f"{message.from_user.full_name}, фотографію надіслано успішно!")
 
@@ -41,3 +41,15 @@ async def cancel_command(message: types.Message, state: FSMContext):
         return
     await state.finish()
     await message.answer("Операція скасована.")
+
+async def handle_user_sending(state, user_id):
+    async with state.proxy() as data:
+        file_path = await bot.get_file(data['photo'])
+        print(file_path)
+        downloaded_file = await bot.download_file(file_path.file_path)
+        photo_path = f"photos/{user_id}_{data['photo']}.jpg"  
+        with open(photo_path, 'wb') as new_file:
+            new_file.write(downloaded_file.read())
+
+        db.update_user_photo_path(user_id, photo_path)
+        db.update_user_nickname(user_id, data['nickname'])

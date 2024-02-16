@@ -66,7 +66,3 @@ def check_user_existence(user_id):
     conn.close()
 
     return user_data is not None
-
-async def handle_user_sending(state):
-    async with state.proxy() as data:
-        print(data['photo'])
