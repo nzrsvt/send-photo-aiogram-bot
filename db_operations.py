@@ -72,11 +72,11 @@ def check_user_photo_existence(user_id):
     conn, cur = connect_db()
 
     cur.execute('SELECT photo_path FROM users WHERE user_id = ?', (user_id,))
-    photo_path = cur.fetchone()
+    result = cur.fetchone()
 
     conn.close()
 
-    return photo_path is not None
+    return result is not None and result[0] is not None
 
 def delete_user_photo(user_id):
     conn, cur = connect_db()

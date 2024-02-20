@@ -29,9 +29,9 @@ async def start_command(message: types.Message):
 
 async def user_menu_call(callback : types.CallbackQuery):
     if db.check_user_photo_existence(callback.from_user.id):
-        await callback.message.answer('⬇️ Для надсилання фотографії натисніть нижче.',reply_markup=user_kb.send_kb)
-    else:
         await callback.message.answer('⬇️ Для скаcування надсилання фотографії натисніть нижче.',reply_markup=user_kb.cancel_kb)
+    else:
+        await callback.message.answer('⬇️ Для надсилання фотографії натисніть нижче.',reply_markup=user_kb.send_kb)
     await callback.answer()
 
 def register_handlers(dp : Dispatcher):

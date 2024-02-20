@@ -18,6 +18,7 @@ async def process_photo(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
             if message.photo:
                 if message.photo[-1].file_size > 2 * 1024 * 1024:
+                    await state.finish()
                     await message.answer("🚫 Розмір фотографії перевищує 2МБ.")
                     await message.answer(
                         f"🖇 Якщо Ви бажаєте надіслати іншу фотографію, натисніть на кнопку нижче.", 
@@ -29,6 +30,7 @@ async def process_photo(message: types.Message, state: FSMContext):
                     await PhotoSubmission.next()
             elif message.document:
                 if message.document.file_size > 2 * 1024 * 1024:
+                    await state.finish()
                     await message.answer("🚫 Розмір фотографії перевищує 2МБ.")
                     await message.answer(
                         f"🖇 Якщо Ви бажаєте надіслати іншу фотографію, натисніть на кнопку нижче.", 
@@ -42,12 +44,14 @@ async def process_photo(message: types.Message, state: FSMContext):
                         await message.answer("Фотографію збережено. Тепер введіть свій Instagram-нікнейм.")
                         await PhotoSubmission.next()
                     else:
+                        await state.finish()
                         await message.answer("🚫 Будь ласка, надішліть фотографію в іншому форматі.")
                         await message.answer(
                             f"🖇 Якщо Ви бажаєте надіслати іншу фотографію, натисніть на кнопку нижче.", 
                             reply_markup=user_kb.send_kb
                             )
             else:
+                await state.finish()
                 await message.answer("🚫 Будь ласка, надішліть фотографію в іншому форматі.")
                 await message.answer(
                     f"🖇 Якщо Ви бажаєте надіслати іншу фотографію, натисніть на кнопку нижче.", 
