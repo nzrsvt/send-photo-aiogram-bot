@@ -29,9 +29,10 @@ async def start_command(message: types.Message):
 
 async def user_menu_call(callback : types.CallbackQuery):
     if db.check_user_instagram_existence(callback.from_user.id):
-        await callback.message.answer('⬇️ Для початку роботи з ботом потрібно вказати свій Instagram-нікнейм. Натисніть на кнопку нижче.',reply_markup=user_kb.enter_instagram_kb)
-    else:
+        print(db.check_user_instagram_existence(callback.from_user.id))
         await callback.message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+    else:
+        await callback.message.answer('⬇️ Для початку роботи з ботом потрібно вказати свій Instagram-нікнейм. Натисніть на кнопку нижче.',reply_markup=user_kb.enter_instagram_kb)
     await callback.answer()
 
 # async def user_menu_call(callback : types.CallbackQuery):

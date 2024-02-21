@@ -66,7 +66,7 @@ def check_user_instagram_existence(user_id):
 
     conn.close()
 
-    return result is not None and result[0] != 'None'
+    return result is not None and result[0] != 'None' and result[0] is not None
 
 # def delete_user_photo(user_id):
 #     conn, cur = connect_db()
