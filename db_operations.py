@@ -46,7 +46,7 @@ def update_user_photo_path(user_id, photo_path):
     conn.commit()
     conn.close()
 
-def update_user_nickname(user_id, instagram_nickname):
+def update_user_instagram(user_id, instagram_nickname):
     conn, cur = connect_db()
 
     cur.execute('''
@@ -67,6 +67,19 @@ def check_user_existence(user_id):
     conn.close()
 
     return user_data is not None
+
+def check_user_instagram_existence(user_id):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT instagram_nickname FROM users WHERE user_id = ?', (user_id,))
+
+    result = cur.fetchone()
+
+    print(result)
+
+    conn.close()
+
+    return result is not None and result[0] != 'None'
 
 def check_user_photo_existence(user_id):
     conn, cur = connect_db()
