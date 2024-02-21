@@ -15,7 +15,6 @@ def create_users_table():
             user_id INTEGER NOT NULL,
             username TEXT,
             full_name TEXT,
-            photo_path TEXT,
             instagram_nickname TEXT
         )
     ''')
@@ -30,18 +29,6 @@ def add_user(user_id, username, full_name):
         INSERT INTO users (user_id, username, full_name)
         VALUES (?, ?, ?)
     ''', (user_id, username, full_name))
-
-    conn.commit()
-    conn.close()
-
-def update_user_photo_path(user_id, photo_path):
-    conn, cur = connect_db()
-
-    cur.execute('''
-        UPDATE users
-        SET photo_path = ?
-        WHERE user_id = ?
-    ''', (photo_path, user_id))
 
     conn.commit()
     conn.close()
@@ -81,30 +68,20 @@ def check_user_instagram_existence(user_id):
 
     return result is not None and result[0] != 'None'
 
-def check_user_photo_existence(user_id):
-    conn, cur = connect_db()
+# def delete_user_photo(user_id):
+#     conn, cur = connect_db()
 
-    cur.execute('SELECT photo_path FROM users WHERE user_id = ?', (user_id,))
-    result = cur.fetchone()
+#     cur.execute('SELECT photo_path FROM users WHERE user_id = ?', (user_id,))
+#     photo_path = cur.fetchone()
 
-    conn.close()
+#     if photo_path:
+#         try:
+#             os.remove(str(photo_path[0]))
+#         except FileNotFoundError:
+#             pass  
 
-    return result is not None and result[0] is not None
+#         cur.execute('UPDATE users SET photo_path = NULL WHERE user_id = ?', (user_id,))
 
-def delete_user_photo(user_id):
-    conn, cur = connect_db()
+#         conn.commit()
 
-    cur.execute('SELECT photo_path FROM users WHERE user_id = ?', (user_id,))
-    photo_path = cur.fetchone()
-
-    if photo_path:
-        try:
-            os.remove(str(photo_path[0]))
-        except FileNotFoundError:
-            pass  
-
-        cur.execute('UPDATE users SET photo_path = NULL WHERE user_id = ?', (user_id,))
-
-        conn.commit()
-
-    conn.close()
+#     conn.close()

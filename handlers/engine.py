@@ -48,6 +48,9 @@ def register_handlers(dp : Dispatcher):
 
     dp.register_callback_query_handler(enter_instagram_nickname_command, lambda c: c.data == 'enter_instagram_cb', state=None)
     dp.register_message_handler(process_instagram_nickname, state=InstagramEntering.instagram_nickname)
+    
+    dp.register_callback_query_handler(send_photo_command, lambda c: c.data == 'send_photo_cb', state=None)
+    dp.register_message_handler(process_photo,content_types=['photo', 'document'], state=PhotoSending.photo)
 
     # dp.register_callback_query_handler(submit_photo_command, lambda c: c.data == 'submit_photo_cb', state=None)
     # dp.register_message_handler(cancel_command, Text(equals=["відмінити", "скасувати", "відміна"], ignore_case=True), state='*')

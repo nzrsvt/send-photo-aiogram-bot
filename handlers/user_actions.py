@@ -8,6 +8,9 @@ from keyboards import user_kb
 class InstagramEntering(StatesGroup):
     instagram_nickname = State()
 
+class PhotoSending(StatesGroup):
+    photo = State()
+
 async def enter_instagram_nickname_command(callback : types.CallbackQuery):
     await InstagramEntering.instagram_nickname.set()
     await callback.message.answer("Введіть свій Instagram-нікнейм:")
@@ -24,6 +27,53 @@ async def process_instagram_nickname(message: types.Message, state: FSMContext):
     await state.finish()
     await message.answer(f"✅ {message.from_user.full_name}, нікнейм збережено успішно!")
     await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+
+async def send_photo_command(callback : types.CallbackQuery):
+    await PhotoSending.photo.set()
+    await callback.message.answer("Надішліть свою фотографію:")
+    await callback.answer()
+
+async def process_photo(message: types.Message, state: FSMContext):
+        if message.photo:
+            if message.photo[-1].file_size > 2 * 1024 * 1024:
+                await state.finish()
+                await message.answer("🚫 Розмір фотографії перевищує 2МБ.")
+                await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+            else:
+                photo = message.photo[-1].file_id
+                await handle_user_photo(message.chat.id, photo)
+                await message.answer("Фотографію збережено.")
+                await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+                await state.finish()
+        elif message.document:
+            if message.document.file_size > 2 * 1024 * 1024:
+                await state.finish()
+                await message.answer("🚫 Розмір фотографії перевищує 2МБ.")
+                await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+            else:
+                file_name = message.document.file_name.lower()
+                allowed_formats = ('.png', '.jpg', '.jpeg') 
+                if any(file_name.endswith(format) for format in allowed_formats):
+                    photo = message.document.file_id
+                    await handle_user_photo(message.chat.id, photo)
+                    await message.answer("Фотографію збережено.")
+                    await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+                    await state.finish()
+                else:
+                    await state.finish()
+                    await message.answer("🚫 Будь ласка, надішліть фотографію в іншому форматі.")
+                    await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+        else:
+            await state.finish()
+            await message.answer("🚫 Будь ласка, надішліть фотографію в іншому форматі.")
+            await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+    
+async def handle_user_photo(user_id, photo):
+    file_path = await bot.get_file(photo)
+    downloaded_file = await bot.download_file(file_path.file_path)
+    photo_path = f"photos/{user_id}_{photo}.jpg"  
+    with open(photo_path, 'wb') as new_file:
+        new_file.write(downloaded_file.read())
 
 # async def process_nickname(message: types.Message, state: FSMContext):
 #     async with state.proxy() as data:
