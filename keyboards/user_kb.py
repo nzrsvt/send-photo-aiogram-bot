@@ -13,6 +13,16 @@ manage_photos_btn = InlineKeyboardButton('📋 Керувати надіслан
 action_choose_kb = InlineKeyboardMarkup()
 action_choose_kb.add(send_photo_btn).add(manage_photos_btn)
 
+def get_delete_photo_keyboard(photo_path):
+    keyboard = InlineKeyboardMarkup().add(
+        InlineKeyboardButton(text="🗑 Видалити фотографію", callback_data = f"del,{photo_path}")
+    )
+    return keyboard
+
+return_to_menu_btn = InlineKeyboardButton('◀️ Повернутись в меню', callback_data='return_to_menu_cb')
+return_to_menu_kb = InlineKeyboardMarkup()
+return_to_menu_kb.add(return_to_menu_btn)
+
 # submit_photo_btn = InlineKeyboardButton('📸 Надіслати фотографію', callback_data='submit_photo_cb')
 # send_kb = InlineKeyboardMarkup().add(submit_photo_btn)
 

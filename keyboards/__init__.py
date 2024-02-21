@@ -1,1 +1,1 @@
-from keyboards.user_kb import start_kb, enter_instagram_kb, action_choose_kb
+from keyboards.user_kb import start_kb, enter_instagram_kb, action_choose_kb, get_delete_photo_keyboard, return_to_menu_kb

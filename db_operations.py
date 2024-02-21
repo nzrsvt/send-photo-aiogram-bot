@@ -62,8 +62,6 @@ def check_user_instagram_existence(user_id):
 
     result = cur.fetchone()
 
-    print(result)
-
     conn.close()
 
     return result is not None and result[0] != 'None' and result[0] is not None
