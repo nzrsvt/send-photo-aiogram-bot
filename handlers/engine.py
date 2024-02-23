@@ -9,7 +9,7 @@ import aiogram.dispatcher.filters
 from aiogram_media_group import media_group_handler
 from aiogram.dispatcher.filters import MediaGroupFilter
 
-from handlers.user_actions import *
+from handlers.user_actions import * 
 
 async def start_command(message: types.Message):
     if db.check_user_existence(message.chat.id):
@@ -34,6 +34,7 @@ async def start_command(message: types.Message):
         )
 
 async def user_menu_call(callback : types.CallbackQuery):
+    await remove_previous_kb(callback)
     if db.check_user_instagram_existence(callback.from_user.id):
         await callback.message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
     else:
@@ -47,6 +48,10 @@ def register_handlers(dp : Dispatcher):
 
     dp.register_callback_query_handler(enter_instagram_nickname_command, lambda c: c.data == 'enter_instagram_cb', state=None)
     dp.register_message_handler(process_instagram_nickname, state=InstagramEntering.instagram_nickname)
+
+    dp.register_message_handler(cancel_command, Text(equals=["відмінити", "скасувати", "відміна"], ignore_case=True), state='*')
+
+    dp.register_message_handler(process_instagram_nickname, state=InstagramChanging.instagram_nickname)
     
     dp.register_callback_query_handler(send_photo_command, lambda c: c.data == 'send_photo_cb', state=None)
     dp.register_message_handler(process_photo_group, MediaGroupFilter(is_media_group=True), content_types=['photo', 'document'], state=PhotoSending.photo)
@@ -54,4 +59,3 @@ def register_handlers(dp : Dispatcher):
     
     dp.register_callback_query_handler(manage_photos_command, lambda c: c.data == 'manage_photos_cb')
     dp.register_callback_query_handler(delete_photo_command, lambda c: c.data.startswith('del'))
-    # dp.register_message_handler(cancel_command, Text(equals=["відмінити", "скасувати", "відміна"], ignore_case=True), state='*')

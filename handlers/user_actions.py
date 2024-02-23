@@ -8,17 +8,27 @@ import os
 from aiogram_media_group import media_group_handler
 from typing import List, Union
 import asyncio
+from aiogram.types import ParseMode
+from aiogram.utils.exceptions import MessageNotModified
 
 class InstagramEntering(StatesGroup):
+    instagram_nickname = State()
+
+class InstagramChanging(StatesGroup):
     instagram_nickname = State()
 
 class PhotoSending(StatesGroup):
     photo = State()
 
 async def enter_instagram_nickname_command(callback : types.CallbackQuery):
-    await InstagramEntering.instagram_nickname.set()
+    await remove_previous_kb(callback)
+    if not db.check_user_instagram_existence(callback.from_user.id):
+        await InstagramEntering.instagram_nickname.set()
+    else:
+        await InstagramChanging.instagram_nickname.set()
+
     await callback.message.answer("Введіть свій Instagram-нікнейм:")
-    await callback.answer()
+    await callback.answer() 
 
 async def process_instagram_nickname(message: types.Message, state: FSMContext):
     try:
@@ -40,6 +50,7 @@ async def process_instagram_nickname(message: types.Message, state: FSMContext):
         await message.answer('⬇️ Для початку роботи з ботом потрібно вказати свій Instagram-нікнейм. Натисніть на кнопку нижче.',reply_markup=user_kb.enter_instagram_kb)
         
 async def send_photo_command(callback : types.CallbackQuery):
+    await remove_previous_kb(callback)
     await PhotoSending.photo.set()
     await callback.message.answer("Надішліть свою фотографію: (одну або декілька)")
     await callback.answer()
@@ -111,6 +122,7 @@ async def handle_user_photo(user_id, photo):
         new_file.write(downloaded_file.read())
 
 async def manage_photos_command(callback : types.CallbackQuery):
+    await remove_previous_kb(callback) 
     photos = await get_user_photos(callback.from_user.id)
     if photos:
         await callback.message.answer("📌 Всі ваші фотографії:")
@@ -143,25 +155,38 @@ async def get_user_photos(user_id):
     return user_photos
 
 async def delete_photo_command(callback: types.CallbackQuery):
+    await remove_previous_kb(callback)
     action, photo_path = callback.data.split(',')
 
     user_photos = await get_user_photos(callback.from_user.id)
-
-    for user_photo_path in user_photos:
-        if photo_path in user_photo_path:
-            os.remove(user_photo_path)
-            break
-    await callback.answer("✅ Фотографію видалено.")
-    await manage_photos_command(callback)
+    try:
+        for user_photo_path in user_photos:
+            if photo_path in user_photo_path:
+                os.remove(user_photo_path)
+                success = True
+                break
+        if success:
+            await callback.answer("✅ Фотографію видалено.")
+        else:
+            await callback.answer("❌ Фотографія видалена раніше.")
+    except:
+        await callback.answer("❌ Фотографія видалена раніше.")
     await callback.answer()
 
-# async def cancel_command(message: types.Message, state: FSMContext):
-#     current_state = await state.get_state()
-#     if current_state is None:
-#         return
-#     await state.finish()
-#     await message.answer("🗑 Операція скасована.")
-#     await message.answer(
-#          f"🖇 Якщо Ви бажаєте надіслати іншу фотографію, натисніть на кнопку нижче.", 
-#          reply_markup=user_kb.send_kb
-#          )
+async def remove_previous_kb(callback: types.CallbackQuery):
+    try:
+        await bot.edit_message_reply_markup(
+            chat_id=callback.message.chat.id, 
+            message_id=callback.message.message_id,
+            reply_markup=None
+            )
+    except MessageNotModified:
+        pass
+
+async def cancel_command(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    await state.finish()
+    await message.answer("✅ Операція скасована.")
+    await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
