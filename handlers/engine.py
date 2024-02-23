@@ -2,6 +2,12 @@ from aiogram import types, Dispatcher
 import db_operations as db
 from keyboards import user_kb
 from aiogram.dispatcher.filters import Text
+from aiogram import types
+from aiogram.dispatcher.filters import ContentTypeFilter
+from aiogram.types import MediaGroup, InputMediaDocument
+import aiogram.dispatcher.filters
+from aiogram_media_group import media_group_handler
+from aiogram.dispatcher.filters import MediaGroupFilter
 
 from handlers.user_actions import *
 
@@ -17,7 +23,7 @@ async def start_command(message: types.Message):
         await message.delete()
         await message.answer(
             f'👋 {message.from_user.full_name}, '
-            'Вас вітає бот для подачі фотографії для надсилання фотографій!',
+            'Вас вітає бот для надсилання фотографій!',
             reply_markup=user_kb.start_kb
         )
 
@@ -43,15 +49,9 @@ def register_handlers(dp : Dispatcher):
     dp.register_message_handler(process_instagram_nickname, state=InstagramEntering.instagram_nickname)
     
     dp.register_callback_query_handler(send_photo_command, lambda c: c.data == 'send_photo_cb', state=None)
-    dp.register_message_handler(process_photo,content_types=['photo', 'document'], state=PhotoSending.photo)
-
+    dp.register_message_handler(process_photo_group, MediaGroupFilter(is_media_group=True), content_types=['photo', 'document'], state=PhotoSending.photo)
+    dp.register_message_handler(process_photo, content_types=['photo', 'document'], state=PhotoSending.photo)
+    
     dp.register_callback_query_handler(manage_photos_command, lambda c: c.data == 'manage_photos_cb')
     dp.register_callback_query_handler(delete_photo_command, lambda c: c.data.startswith('del'))
-
-    # dp.register_callback_query_handler(submit_photo_command, lambda c: c.data == 'submit_photo_cb', state=None)
     # dp.register_message_handler(cancel_command, Text(equals=["відмінити", "скасувати", "відміна"], ignore_case=True), state='*')
-    # dp.register_message_handler(process_photo,content_types=['photo', 'document'], state=PhotoSubmission.photo)
-    # dp.register_message_handler(process_nickname, state=PhotoSubmission.nickname)
-
-    # dp.register_callback_query_handler(cancel_photo_command, lambda c: c.data == 'cancel_photo_cb')
-    
