@@ -7,6 +7,7 @@ from keyboards import user_kb
 import os
 from aiogram_media_group import media_group_handler
 from typing import List, Union
+import asyncio
 
 class InstagramEntering(StatesGroup):
     instagram_nickname = State()
@@ -43,10 +44,8 @@ async def send_photo_command(callback : types.CallbackQuery):
     await callback.message.answer("Надішліть свою фотографію: (одну або декілька)")
     await callback.answer()
 
-# success: 0 = saved, 1 = too large, 2 = wrong format
-    
 async def process_photo(message: types.Message, state: FSMContext):
-    success = await process_photo(message, state)
+    success = await check_photo(message, state)
     if success == 0:
         await message.answer("💾 Фотографію збережено.")
         await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
@@ -61,7 +60,7 @@ async def process_photo(message: types.Message, state: FSMContext):
 @media_group_handler()
 async def process_photo_group(messages: List[types.Message], state: FSMContext):
     for message in messages:
-        success = await process_photo(message, state)
+        success = await check_photo(message, state)
         if success != 0:
             if success == 1:
                 await message.answer("🚫 Розмір фотографії перевищує 2МБ.")
@@ -71,10 +70,11 @@ async def process_photo_group(messages: List[types.Message], state: FSMContext):
                 await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
             break
     if success == 0:
-        await message.answer("💾 Фотографію збережено.")
+        await message.answer("💾 Фотографії збережено.")
         await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
     await state.finish() 
 
+# return values: 0 = saved, 1 = too large, 2 = wrong format
 async def check_photo(message: types.Message, state: FSMContext):
     if message.photo:
         if message.photo[-1].file_size > 2 * 1024 * 1024:
@@ -118,6 +118,7 @@ async def manage_photos_command(callback : types.CallbackQuery):
             with open(photo_path, 'rb') as photo_file:
                 keyboard = user_kb.get_delete_photo_keyboard(str(os.path.basename(photo_path))[:58])
                 await bot.send_photo(chat_id=callback.from_user.id, photo=photo_file, reply_markup=keyboard)
+                await asyncio.sleep(1)
         await callback.message.answer("ℹ️ Ви можете видаляти фотографії за допомогою кнопки 'Видалити фотографію'.", reply_markup=user_kb.return_to_menu_kb)
     else:
         await callback.message.answer("❌ Ви не маєте жодної фотографії.", reply_markup=user_kb.return_to_menu_kb)

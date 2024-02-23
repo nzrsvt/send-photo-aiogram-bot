@@ -65,21 +65,3 @@ def check_user_instagram_existence(user_id):
     conn.close()
 
     return result is not None and result[0] != 'None' and result[0] is not None
-
-# def delete_user_photo(user_id):
-#     conn, cur = connect_db()
-
-#     cur.execute('SELECT photo_path FROM users WHERE user_id = ?', (user_id,))
-#     photo_path = cur.fetchone()
-
-#     if photo_path:
-#         try:
-#             os.remove(str(photo_path[0]))
-#         except FileNotFoundError:
-#             pass  
-
-#         cur.execute('UPDATE users SET photo_path = NULL WHERE user_id = ?', (user_id,))
-
-#         conn.commit()
-
-#     conn.close()
