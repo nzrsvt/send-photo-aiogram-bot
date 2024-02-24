@@ -21,12 +21,11 @@ class PhotoSending(StatesGroup):
     photo = State()
 
 async def enter_instagram_nickname_command(callback : types.CallbackQuery):
-    await remove_previous_kb(callback)
-    if not db.check_user_instagram_existence(callback.from_user.id):
+    if callback.data == 'enter_instagram_cb':
         await InstagramEntering.instagram_nickname.set()
     else:
         await InstagramChanging.instagram_nickname.set()
-
+    await remove_previous_kb(callback)
     await callback.message.answer("Введіть свій Instagram-нікнейм:")
     await callback.answer() 
 
@@ -156,6 +155,8 @@ async def get_user_photos(user_id):
 
 async def delete_photo_command(callback: types.CallbackQuery):
     await remove_previous_kb(callback)
+    await mark_photo_deleted(callback)
+
     action, photo_path = callback.data.split(',')
 
     user_photos = await get_user_photos(callback.from_user.id)
@@ -179,6 +180,16 @@ async def remove_previous_kb(callback: types.CallbackQuery):
             chat_id=callback.message.chat.id, 
             message_id=callback.message.message_id,
             reply_markup=None
+            )
+    except MessageNotModified:
+        pass
+
+async def mark_photo_deleted(callback: types.CallbackQuery):
+    try:
+        await bot.edit_message_caption(
+            chat_id=callback.message.chat.id, 
+            message_id=callback.message.message_id,
+            caption="❎ Фотографія видалена."
             )
     except MessageNotModified:
         pass

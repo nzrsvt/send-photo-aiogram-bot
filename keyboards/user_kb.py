@@ -10,7 +10,7 @@ enter_instagram_kb.add(enter_instagram_btn)
 
 send_photo_btn = InlineKeyboardButton('📸 Надіслати фотографію', callback_data='send_photo_cb')
 manage_photos_btn = InlineKeyboardButton('📋 Керувати надісланими фотографіями', callback_data='manage_photos_cb')
-change_instagram_btn = InlineKeyboardButton('🏷 Змінити Instagram-нікнейм', callback_data='enter_instagram_cb')
+change_instagram_btn = InlineKeyboardButton('🏷 Змінити Instagram-нікнейм', callback_data='change_instagram_cb')
 action_choose_kb = InlineKeyboardMarkup()
 action_choose_kb.add(send_photo_btn).add(manage_photos_btn).add(change_instagram_btn)
 
