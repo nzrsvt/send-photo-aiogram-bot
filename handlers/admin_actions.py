@@ -44,20 +44,22 @@ async def process_username(message: types.Message, state: FSMContext):
         await message.answer(f"⚠️ Виникла помилка {e} при обробці запиту.")
         await state.finish()
     
-# async def manage_users_command(callback : types.CallbackQuery):
-#     await remove_previous_kb(callback) 
-#     users = db.get_all_users()
-#     if users:
-#         await callback.message.answer("📌 Всі ваші фотографії:")
-#         for photo_path in photos:
-#             with open(photo_path, 'rb') as photo_file:
-#                 keyboard = user_kb.get_delete_photo_keyboard(str(os.path.basename(photo_path))[:58])
-#                 await bot.send_photo(chat_id=callback.from_user.id, photo=photo_file, reply_markup=keyboard)
-#                 await asyncio.sleep(1)
-#         await callback.message.answer("ℹ️ Ви можете видаляти фотографії за допомогою кнопки 'Видалити фотографію'.", reply_markup=user_kb.return_to_menu_kb)
-#     else:
-#         await callback.message.answer("❌ Ви не маєте жодної фотографії.", reply_markup=user_kb.return_to_menu_kb)
-#     await callback.answer()
+async def user_list_command(callback : types.CallbackQuery):
+    await remove_previous_kb(callback) 
+    users = db.get_all_users()
+    if users:
+        print(users)
+        user_list = ""
+        for user in users:
+            if len(user_list) > 4000:
+                await callback.message.answer(user_list)
+                user_list = ""
+            user_list = user_list + f"tg: @{user[2]} - inst: @{user[4]}\n"
+        await callback.message.answer(user_list)
+    else:
+        await callback.message.answer("❌ Неможливо отримати список користувачів.")
+    await callback.message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
+    await callback.answer()
 
 async def select_user_command(callback : types.CallbackQuery):
     await UserSelecting.username.set()
@@ -76,16 +78,17 @@ async def send_user_photos(message: types.Message, state: FSMContext):
         if db.check_user_existence_by_username(username):
             photos = await get_user_photos(db.get_user_id_by_username(username))
             if photos:
-                await message.answer("📌 Усі фотографії обраного користувача:")
+                instagram_nickname = db.get_instagram_nickname_by_username(username)
+                await message.answer(f"📌 Усі фотографії обраного користувача: (inst: {instagram_nickname})")
                 for photo_path in photos:
                     with open(photo_path, 'rb') as photo_file:
                         await bot.send_document(chat_id=message.chat.id, document=photo_file)
                         await asyncio.sleep(1)
             else:
-                await message.answer("❌ Користувач не завантажив фотографії.", reply_markup=user_kb.return_to_menu_kb)
+                await message.answer("❌ Користувач не завантажив жодної фотографії.")
             await message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
         else:
-            await message.answer(f"❌ Користувач {username} ще не працював з ботом.")
+            await message.answer(f"❌ Користувач @{username} ще не працював з ботом.")
             await message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
         await state.finish()
     except Exception as e:

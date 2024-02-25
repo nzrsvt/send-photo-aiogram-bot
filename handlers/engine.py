@@ -79,7 +79,7 @@ def register_handlers(dp : Dispatcher):
     dp.register_callback_query_handler(add_admin_command, lambda c: c.data == 'add_admin_cb', state=None)
     dp.register_message_handler(process_username, state=AdminAdding.username)
 
-    #dp.register_callback_query_handler(manage_users_command, lambda c: c.data == 'manage_users_cb')
+    dp.register_callback_query_handler(user_list_command, lambda c: c.data == 'user_list_cb')
 
     dp.register_callback_query_handler(select_user_command, lambda c: c.data == 'select_user_cb', state=None)
     dp.register_message_handler(send_user_photos, state=UserSelecting.username)

@@ -123,3 +123,13 @@ def get_user_id_by_username(username):
     conn.close()
 
     return result[0] if result else None
+
+def get_instagram_nickname_by_username(username):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT instagram_nickname FROM users WHERE username = ?', (username.lower(),))
+    result = cur.fetchone()
+
+    conn.close()
+
+    return result[0] if result and result[0] != 'None' and result[0] is not None else None
