@@ -113,3 +113,13 @@ def check_is_admin_by_username(username):
     conn.close()
 
     return result and result[0]
+
+def get_user_id_by_username(username):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT user_id FROM users WHERE username = ?', (username.lower(),))
+    result = cur.fetchone()
+
+    conn.close()
+
+    return result[0] if result else None

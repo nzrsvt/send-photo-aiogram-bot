@@ -10,7 +10,7 @@ from typing import List, Union
 import asyncio
 from aiogram.types import ParseMode
 from aiogram.utils.exceptions import MessageNotModified
-from additional_functions import remove_previous_kb
+from additional_functions import remove_previous_kb, get_user_photos
 
 class InstagramEntering(StatesGroup):
     instagram_nickname = State()
@@ -134,24 +134,6 @@ async def manage_photos_command(callback : types.CallbackQuery):
     else:
         await callback.message.answer("❌ Ви не маєте жодної фотографії.", reply_markup=user_kb.return_to_menu_kb)
     await callback.answer()
-
-async def get_user_photos(user_id):
-    user_photos = []
-
-    user_folder_path = os.path.join("photos", str(user_id))
-
-    if not os.path.exists(user_folder_path):
-        return None
-    
-    for file_name in os.listdir(user_folder_path):
-        if file_name.lower().endswith((".jpg", ".jpeg", ".png")):
-            photo_path = os.path.join(user_folder_path, file_name)
-            user_photos.append(photo_path)
-
-    if not user_photos:
-        return None
-
-    return user_photos
 
 async def delete_photo_command(callback: types.CallbackQuery):
     await remove_previous_kb(callback)
