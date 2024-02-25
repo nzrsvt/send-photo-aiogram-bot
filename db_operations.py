@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 def connect_db():
     conn = sqlite3.connect('database.db')
@@ -15,7 +14,8 @@ def create_users_table():
             user_id INTEGER NOT NULL,
             username TEXT,
             full_name TEXT,
-            instagram_nickname TEXT
+            instagram_nickname TEXT,
+            is_admin BOOLEAN DEFAULT FALSE
         )
     ''')
 
@@ -55,6 +55,16 @@ def check_user_existence(user_id):
 
     return user_data is not None
 
+def check_user_existence_by_username(username):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT * FROM users WHERE username = ?', (username.lower(),))
+    user_data = cur.fetchone()
+
+    conn.close()
+
+    return user_data is not None
+
 def check_user_instagram_existence(user_id):
     conn, cur = connect_db()
 
@@ -65,3 +75,41 @@ def check_user_instagram_existence(user_id):
     conn.close()
 
     return result is not None and result[0] != 'None' and result[0] is not None
+
+def get_all_users():
+    conn, cur = connect_db()
+
+    cur.execute('SELECT * FROM users')
+    all_users = cur.fetchall()
+
+    conn.close()
+
+    return all_users
+
+def set_as_admin(username):
+    conn, cur = connect_db()
+
+    cur.execute('UPDATE users SET is_admin = ? WHERE username = ?', (True, username.lower()))
+
+    conn.commit()
+    conn.close()
+
+def check_is_admin(user_id):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT is_admin FROM users WHERE user_id = ?', (user_id,))
+    result = cur.fetchone()
+
+    conn.close()
+
+    return result and result[0]
+
+def check_is_admin_by_username(username):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT is_admin FROM users WHERE username = ?', (username.lower(),))
+    result = cur.fetchone()
+
+    conn.close()
+
+    return result and result[0]

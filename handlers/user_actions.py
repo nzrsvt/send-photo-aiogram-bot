@@ -10,6 +10,7 @@ from typing import List, Union
 import asyncio
 from aiogram.types import ParseMode
 from aiogram.utils.exceptions import MessageNotModified
+from additional_functions import remove_previous_kb
 
 class InstagramEntering(StatesGroup):
     instagram_nickname = State()
@@ -174,16 +175,6 @@ async def delete_photo_command(callback: types.CallbackQuery):
         await callback.answer("❌ Фотографія видалена раніше.")
     await callback.answer()
 
-async def remove_previous_kb(callback: types.CallbackQuery):
-    try:
-        await bot.edit_message_reply_markup(
-            chat_id=callback.message.chat.id, 
-            message_id=callback.message.message_id,
-            reply_markup=None
-            )
-    except MessageNotModified:
-        pass
-
 async def mark_photo_deleted(callback: types.CallbackQuery):
     try:
         await bot.edit_message_caption(
@@ -193,11 +184,3 @@ async def mark_photo_deleted(callback: types.CallbackQuery):
             )
     except MessageNotModified:
         pass
-
-async def cancel_command(message: types.Message, state: FSMContext):
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-    await state.finish()
-    await message.answer("✅ Операція скасована.")
-    await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
