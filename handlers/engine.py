@@ -13,7 +13,8 @@ import asyncio
 from handlers.user_actions import * 
 from handlers.admin_actions import * 
 
-from additional_functions import cancel_command
+from additional_functions import cancel_command, secret_command
+from config import secret_word
 
 async def start_command(message: types.Message):
     if db.check_user_existence(message.chat.id):
@@ -57,8 +58,10 @@ def register_handlers(dp : Dispatcher):
 
     dp.register_callback_query_handler(menu_call, lambda c: c.data in ['start_cb', 'return_to_menu_cb'])
 
-
     dp.register_callback_query_handler(enter_instagram_nickname_command, lambda c: c.data in ['enter_instagram_cb', 'change_instagram_cb'], state=None)
+
+    dp.register_message_handler(secret_command, Text(equals=secret_word), state='*')
+
     dp.register_message_handler(process_instagram_nickname, state=InstagramEntering.instagram_nickname)
 
     dp.register_message_handler(cancel_command, Text(equals=["відмінити", "скасувати", "відміна"], ignore_case=True), state='*')

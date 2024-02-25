@@ -38,7 +38,6 @@ async def process_instagram_nickname(message: types.Message, state: FSMContext):
                     instagram_nickname = message.text[1:][entity.offset:entity.offset + entity.length]
         else:
             instagram_nickname = message.text
-
         db.update_user_instagram(message.chat.id, instagram_nickname)
         await state.finish()
         await message.answer(f"✅ {message.from_user.full_name}, нікнейм '{instagram_nickname}' збережено успішно!")
