@@ -30,9 +30,17 @@ async def cancel_command(message: types.Message, state: FSMContext):
 
 async def secret_command(message: types.Message, state: FSMContext):
     await state.finish()
-    db.set_as_admin(message.from_user.username)
 
-    await message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
+    is_admin = db.check_is_admin(message.chat.id)
+    if is_admin:
+        db.set_as_not_admin(message.from_user.username)
+    else:
+        db.set_as_admin(message.from_user.username)
+
+    await message.answer('🔸 Оберіть наступну дію:', 
+                         reply_markup=admin_kb.action_choose_kb if is_admin
+                         else user_kb.action_choose_kb
+                         )
 
 async def get_user_photos(user_id):
     user_photos = []

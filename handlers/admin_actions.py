@@ -48,7 +48,6 @@ async def user_list_command(callback : types.CallbackQuery):
     await remove_previous_kb(callback) 
     users = db.get_all_users()
     if users:
-        print(users)
         user_list = ""
         for user in users:
             if len(user_list) > 4000:
