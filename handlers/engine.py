@@ -3,12 +3,7 @@ import db_operations as db
 from keyboards import user_kb, admin_kb
 from aiogram.dispatcher.filters import Text
 from aiogram import types
-from aiogram.dispatcher.filters import ContentTypeFilter
-from aiogram.types import MediaGroup, InputMediaDocument
-import aiogram.dispatcher.filters
-from aiogram_media_group import media_group_handler
 from aiogram.dispatcher.filters import MediaGroupFilter
-import asyncio
 
 from handlers.user_actions import * 
 from handlers.admin_actions import * 

@@ -6,9 +6,8 @@ import db_operations as db
 from keyboards import user_kb
 import os
 from aiogram_media_group import media_group_handler
-from typing import List, Union
+from typing import List
 import asyncio
-from aiogram.types import ParseMode
 from aiogram.utils.exceptions import MessageNotModified
 from additional_functions import remove_previous_kb, get_user_photos
 

@@ -1,4 +1,3 @@
-import logging
 from aiogram import Bot, Dispatcher
 
 from config import API_TOKEN
