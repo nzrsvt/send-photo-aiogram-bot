@@ -1,5 +1,5 @@
 # send-photo-aiogram-bot
-A Telegram bot developed using aiogram to send photos and manage them trough admin menu.
+A Telegram bot developed using aiogram to send photos and manage them through admin menu.
 
 ## Getting Started
 
@@ -52,8 +52,8 @@ Open the config.py file and set your Telegram bot API token and secret word:
 
 # config.py
 ```python
-API_TOKEN = 'paste_bot_api_token_here'
-secret_word = "type_secret_word_here"
+API_TOKEN = 'paste_bot_api_token_here' # you can get this token in the @BotFather bot
+secret_word = "type_secret_word_here" # a word that can be used to obtain administrator rights, any complex set of characters
 ```
 
 ### 7. Run the Bot
