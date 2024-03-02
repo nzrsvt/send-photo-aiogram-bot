@@ -8,9 +8,6 @@ async def onStartup(_):
 
     create_users_table()
     create_photos_table()
-    folder_path='photos'
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
 
     print('Bot has been launched successfully.')
 

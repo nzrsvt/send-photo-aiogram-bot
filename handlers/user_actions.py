@@ -9,7 +9,7 @@ from aiogram_media_group import media_group_handler
 from typing import List
 import asyncio
 from aiogram.utils.exceptions import MessageNotModified
-from additional_functions import remove_previous_kb, get_user_photos
+from additional_functions import remove_previous_kb
 
 class InstagramEntering(StatesGroup):
     instagram_nickname = State()
@@ -86,7 +86,6 @@ async def process_photo_group(messages: List[types.Message], state: FSMContext):
 # return values: 0 = saved, 1 = too large, 2 = wrong format
 async def check_photo(message: types.Message, state: FSMContext):
     if message.photo:
-        print(message.photo[-1].file_id)
         if message.photo[-1].file_size > 2 * 1024 * 1024:
             return 1
         else:
