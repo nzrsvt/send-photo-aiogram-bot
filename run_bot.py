@@ -1,12 +1,13 @@
 from aiogram.utils import executor
 from handlers import engine
 from create_bot import dp
-from db_operations import create_users_table
+from db_operations import create_users_table, create_photos_table
 import os
 
 async def onStartup(_):
 
     create_users_table()
+    create_photos_table()
     folder_path='photos'
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)

@@ -86,11 +86,12 @@ async def process_photo_group(messages: List[types.Message], state: FSMContext):
 # return values: 0 = saved, 1 = too large, 2 = wrong format
 async def check_photo(message: types.Message, state: FSMContext):
     if message.photo:
+        print(message.photo[-1].file_id)
         if message.photo[-1].file_size > 2 * 1024 * 1024:
             return 1
         else:
             photo = message.photo[-1].file_id   
-            await handle_user_photo(message.chat.id, photo)
+            db.add_photo(message.chat.id, photo)
             return 0
     elif message.document:
         if message.document.file_size > 2 * 1024 * 1024:
@@ -100,39 +101,29 @@ async def check_photo(message: types.Message, state: FSMContext):
             allowed_formats = ('.png', '.jpg', '.jpeg') 
             if any(file_name.endswith(format) for format in allowed_formats):
                 photo = message.document.file_id
-                await handle_user_photo(message.chat.id, photo)
+                db.add_photo(message.chat.id, photo)
                 return 0
             else:
                 return 2
     else:
         return 2
     
-async def handle_user_photo(user_id, photo):
-    file_path = await bot.get_file(photo)
-    downloaded_file = await bot.download_file(file_path.file_path)
-
-    user_folder_path = os.path.join("photos", str(user_id))
-    os.makedirs(user_folder_path, exist_ok=True)
-    
-    photo_path = os.path.join(user_folder_path, f"{photo}.jpg")
-
-    with open(photo_path, 'wb') as new_file:
-        new_file.write(downloaded_file.read())
-
 async def manage_photos_command(callback : types.CallbackQuery):
     await remove_previous_kb(callback) 
-    photos = await get_user_photos(callback.from_user.id)
+    photos = db.get_file_ids_by_user_id(callback.from_user.id)
     if photos:
         await callback.message.answer("📌 Всі ваші фотографії:")
-        for photo_path in photos:
-            with open(photo_path, 'rb') as photo_file:
-                keyboard = user_kb.get_delete_photo_keyboard(str(os.path.basename(photo_path))[:58])
-                await bot.send_photo(chat_id=callback.from_user.id, photo=photo_file, reply_markup=keyboard)
-                await asyncio.sleep(1)
+        for file_id in photos:
+            keyboard = user_kb.get_delete_photo_keyboard(str(os.path.basename(file_id))[:58])
+            if len(file_id) == 82:
+                await bot.send_photo(chat_id=callback.from_user.id, photo=file_id, reply_markup=keyboard)
+            else:
+                await bot.send_document(chat_id=callback.from_user.id, document=file_id, reply_markup=keyboard)
+            await asyncio.sleep(1)
         await callback.message.answer("ℹ️ Ви можете видаляти фотографії за допомогою кнопки 'Видалити фотографію'.", reply_markup=user_kb.return_to_menu_kb)
     else:
         await callback.message.answer("❌ Ви не маєте жодної фотографії.", reply_markup=user_kb.return_to_menu_kb)
-    await callback.answer()
+    await callback.answer()    
 
 async def delete_photo_command(callback: types.CallbackQuery):
     await remove_previous_kb(callback)
@@ -140,11 +131,11 @@ async def delete_photo_command(callback: types.CallbackQuery):
 
     action, photo_path = callback.data.split(',')
 
-    user_photos = await get_user_photos(callback.from_user.id)
+    user_photos = db.get_file_ids_by_user_id(callback.from_user.id)
     try:
-        for user_photo_path in user_photos:
-            if photo_path in user_photo_path:
-                os.remove(user_photo_path)
+        for file_id in user_photos:
+            if photo_path in file_id:
+                db.delete_photo_by_file_id(file_id)
                 success = True
                 break
         if success:

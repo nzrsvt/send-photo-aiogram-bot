@@ -141,3 +141,44 @@ def get_instagram_nickname_by_username(username):
     conn.close()
 
     return result[0] if result and result[0] != 'None' and result[0] is not None else None
+
+def create_photos_table():
+    conn, cur = connect_db()
+
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS photos (
+            user_id INTEGER NOT NULL,
+            file_id TEXT NOT NULL,
+            PRIMARY KEY (user_id, file_id),
+            FOREIGN KEY (user_id) REFERENCES users (user_id)
+        )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+def add_photo(user_id, file_id):
+    conn, cur = connect_db()
+
+    cur.execute('INSERT INTO photos (user_id, file_id) VALUES (?, ?)', (user_id, file_id))
+
+    conn.commit()
+    conn.close()
+
+def delete_photo_by_file_id(file_id):
+    conn, cur = connect_db()
+
+    cur.execute('DELETE FROM photos WHERE file_id = ?', (file_id,))
+
+    conn.commit()
+    conn.close()
+
+def get_file_ids_by_user_id(user_id):
+    conn, cur = connect_db()
+
+    cur.execute('SELECT file_id FROM photos WHERE user_id = ?', (user_id,))
+    file_ids = [row[0] for row in cur.fetchall()]
+
+    conn.close()
+
+    return file_ids

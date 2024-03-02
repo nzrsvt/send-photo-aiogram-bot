@@ -1,5 +1,5 @@
 venv/
-#config.py
+config.py
 __pycache__/
 database.db 
 photos/
