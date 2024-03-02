@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types
 import asyncio
 
-from additional_functions import remove_previous_kb, get_user_photos
+from additional_functions import remove_previous_kb
 import db_operations as db
 from create_bot import bot
 from keyboards import admin_kb
@@ -75,14 +75,16 @@ async def send_user_photos(message: types.Message, state: FSMContext):
         else:
             username = message.text
         if db.check_user_existence_by_username(username):
-            photos = await get_user_photos(db.get_user_id_by_username(username))
+            photos = db.get_file_ids_by_user_id(db.get_user_id_by_username(username))
             if photos:
                 instagram_nickname = db.get_instagram_nickname_by_username(username)
                 await message.answer(f"📌 Усі фотографії обраного користувача: (inst: {instagram_nickname})")
-                for photo_path in photos:
-                    with open(photo_path, 'rb') as photo_file:
-                        await bot.send_document(chat_id=message.chat.id, document=photo_file)
-                        await asyncio.sleep(1)
+                for file_id in photos:
+                    if len(file_id) == 82:
+                        await bot.send_photo(chat_id=message.chat.id, photo=file_id)
+                    else:
+                        await bot.send_document(chat_id=message.chat.id, document=file_id)
+                    await asyncio.sleep(1)
             else:
                 await message.answer("❌ Користувач не завантажив жодної фотографії.")
             await message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
