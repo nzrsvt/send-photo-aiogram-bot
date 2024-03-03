@@ -48,12 +48,12 @@ pip install -r requirements.txt
 ```
 
 ### 6. Configure the Bot
-Open the config.py file and set your Telegram bot API token and secret word:
+Create a config.py file and set your Telegram bot API token and secret word:
 
 # config.py
 ```python
-API_TOKEN = 'paste_bot_api_token_here' # you can get this token in the @BotFather bot
-secret_word = "type_secret_word_here" # a word that can be used to obtain administrator rights, any complex set of characters
+API_TOKEN = '' # you can get this token in the @BotFather bot
+secret_word = "" # any complex set of characters that can be used to obtain administrator rights
 ```
 
 ### 7. Run the Bot

@@ -76,5 +76,7 @@ def register_handlers(dp : Dispatcher):
 
     dp.register_callback_query_handler(user_list_command, lambda c: c.data == 'user_list_cb')
 
+    dp.register_callback_query_handler(download_photos_command, lambda c: c.data == 'download_photos_cb')
+
     dp.register_callback_query_handler(select_user_command, lambda c: c.data == 'select_user_cb', state=None)
     dp.register_message_handler(send_user_photos, state=UserSelecting.username)

@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types
 import asyncio
 
-from additional_functions import remove_previous_kb
+from additional_functions import remove_previous_kb, download_and_process_photos
 import db_operations as db
 from create_bot import bot
 from keyboards import admin_kb
@@ -95,3 +95,9 @@ async def send_user_photos(message: types.Message, state: FSMContext):
     except Exception as e:
         await message.answer(f"⚠️ Виникла помилка {e} при обробці запиту.")
         await state.finish()
+
+async def download_photos_command(callback : types.CallbackQuery):
+    await download_and_process_photos(callback.from_user.id)
+    await remove_previous_kb(callback) 
+    await callback.message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
+    await callback.answer()
