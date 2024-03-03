@@ -114,9 +114,9 @@ async def manage_photos_command(callback : types.CallbackQuery):
         await callback.message.answer("📌 Всі ваші фотографії:")
         for file_id in photos:
             keyboard = user_kb.get_delete_photo_keyboard(str(os.path.basename(file_id))[:58])
-            if len(file_id) == 82:
+            try:
                 await bot.send_photo(chat_id=callback.from_user.id, photo=file_id, reply_markup=keyboard)
-            else:
+            except:
                 await bot.send_document(chat_id=callback.from_user.id, document=file_id, reply_markup=keyboard)
             await asyncio.sleep(1)
         await callback.message.answer("ℹ️ Ви можете видаляти фотографії за допомогою кнопки 'Видалити фотографію'.", reply_markup=user_kb.return_to_menu_kb)

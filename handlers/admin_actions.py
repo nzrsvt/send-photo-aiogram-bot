@@ -80,9 +80,9 @@ async def send_user_photos(message: types.Message, state: FSMContext):
                 instagram_nickname = db.get_instagram_nickname_by_username(username)
                 await message.answer(f"📌 Усі фотографії обраного користувача: (inst: {instagram_nickname})")
                 for file_id in photos:
-                    if len(file_id) == 82:
+                    try:
                         await bot.send_photo(chat_id=message.chat.id, photo=file_id)
-                    else:
+                    except:
                         await bot.send_document(chat_id=message.chat.id, document=file_id)
                     await asyncio.sleep(1)
             else:
