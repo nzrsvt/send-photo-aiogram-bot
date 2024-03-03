@@ -48,7 +48,7 @@ pip install -r requirements.txt
 ```
 
 ### 6. Configure the Bot
-Create a config.py file and set your Telegram bot API token and secret word:
+Fill the config.py file and set your Telegram bot API token and secret word:
 
 # config.py
 ```python

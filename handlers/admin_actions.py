@@ -63,7 +63,7 @@ async def user_list_command(callback : types.CallbackQuery):
 async def select_user_command(callback : types.CallbackQuery):
     await UserSelecting.username.set()
     await remove_previous_kb(callback)
-    await callback.message.answer("Введіть ім'я користувача фотографії якого потрібно переглянути: (формату @username)")
+    await callback.message.answer("Введіть Telegram-ім'я користувача фотографії якого потрібно переглянути: (формату @username)")
     await callback.answer() 
 
 async def send_user_photos(message: types.Message, state: FSMContext):
@@ -96,8 +96,15 @@ async def send_user_photos(message: types.Message, state: FSMContext):
         await message.answer(f"⚠️ Виникла помилка {e} при обробці запиту.")
         await state.finish()
 
+is_archiving_photos = False
 async def download_photos_command(callback : types.CallbackQuery):
-    await download_and_process_photos(callback.from_user.id)
+    global is_archiving_photos
+    if is_archiving_photos:
+        await callback.message.answer('❌ Зачекайте, хтось вже викликав формування архіву з фотографіями.')
+    else:
+        is_archiving_photos = True
+        await download_and_process_photos(callback.from_user.id)
+        is_archiving_photos = False
     await remove_previous_kb(callback) 
     await callback.message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
     await callback.answer()

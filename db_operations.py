@@ -102,6 +102,22 @@ def set_as_not_admin(username):
     conn.commit()
     conn.close()
 
+def set_as_admin_by_user_id(user_id):
+    conn, cur = connect_db()
+
+    cur.execute('UPDATE users SET is_admin = ? WHERE user_id = ?', (True, user_id))
+
+    conn.commit()
+    conn.close()
+
+def set_as_not_admin_by_user_id(user_id):
+    conn, cur = connect_db()
+
+    cur.execute('UPDATE users SET is_admin = ? WHERE user_id = ?', (False, user_id))
+
+    conn.commit()
+    conn.close()
+
 def check_is_admin(user_id):
     conn, cur = connect_db()
 

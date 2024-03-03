@@ -34,9 +34,9 @@ async def secret_command(message: types.Message, state: FSMContext):
 
     is_admin = db.check_is_admin(message.chat.id)
     if is_admin:
-        db.set_as_not_admin(message.from_user.username)
+        db.set_as_not_admin_by_user_id(message.chat.id)
     else:
-        db.set_as_admin(message.from_user.username)
+        db.set_as_admin_by_user_id(message.chat.id)
 
     await message.answer('🔸 Оберіть наступну дію:', 
                          reply_markup=user_kb.action_choose_kb if is_admin
