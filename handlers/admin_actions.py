@@ -103,8 +103,10 @@ async def download_photos_command(callback : types.CallbackQuery):
         await callback.message.answer('❌ Зачекайте, хтось вже викликав формування архіву з фотографіями.')
     else:
         is_archiving_photos = True
-        await download_and_process_photos(callback.from_user.id)
+        res = await download_and_process_photos(callback.from_user.id)
         is_archiving_photos = False
     await remove_previous_kb(callback) 
+    if res == -1:
+         await callback.message.answer('❌ Жоден з користувачів не завантажив фотографію.')
     await callback.message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
     await callback.answer()

@@ -69,8 +69,11 @@ async def download_and_process_photos(user_id):
                 with open(file_path, 'wb') as file:
                     file.write(downloaded_file.read())
     
-    await archive_and_send(temp_folder, archive_number, user_id)
-    shutil.rmtree(temp_folder)
+    if os.path.exists(temp_folder) and os.path.isdir(temp_folder):
+        await archive_and_send(temp_folder, archive_number, user_id)
+        shutil.rmtree(temp_folder)
+    else: 
+        return -1
 
 async def get_folder_size(folder_path):
     total_size = 0
