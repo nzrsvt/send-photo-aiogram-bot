@@ -58,7 +58,7 @@ def check_user_existence(user_id):
 def check_user_existence_by_username(username):
     conn, cur = connect_db()
 
-    cur.execute('SELECT * FROM users WHERE username = ?', (username.lower(),))
+    cur.execute('SELECT * FROM users WHERE username = ?', (username,))
     user_data = cur.fetchone()
 
     conn.close()
@@ -89,7 +89,7 @@ def get_all_users():
 def set_as_admin(username):
     conn, cur = connect_db()
 
-    cur.execute('UPDATE users SET is_admin = ? WHERE username = ?', (True, username.lower()))
+    cur.execute('UPDATE users SET is_admin = ? WHERE username = ?', (True, username))
 
     conn.commit()
     conn.close()
@@ -97,7 +97,7 @@ def set_as_admin(username):
 def set_as_not_admin(username):
     conn, cur = connect_db()
 
-    cur.execute('UPDATE users SET is_admin = ? WHERE username = ?', (False, username.lower()))
+    cur.execute('UPDATE users SET is_admin = ? WHERE username = ?', (False, username))
 
     conn.commit()
     conn.close()
@@ -131,7 +131,7 @@ def check_is_admin(user_id):
 def check_is_admin_by_username(username):
     conn, cur = connect_db()
 
-    cur.execute('SELECT is_admin FROM users WHERE username = ?', (username.lower(),))
+    cur.execute('SELECT is_admin FROM users WHERE username = ?', (username,))
     result = cur.fetchone()
 
     conn.close()
@@ -141,7 +141,7 @@ def check_is_admin_by_username(username):
 def get_user_id_by_username(username):
     conn, cur = connect_db()
 
-    cur.execute('SELECT user_id FROM users WHERE username = ?', (username.lower(),))
+    cur.execute('SELECT user_id FROM users WHERE username = ?', (username,))
     result = cur.fetchone()
 
     conn.close()
@@ -151,7 +151,7 @@ def get_user_id_by_username(username):
 def get_instagram_nickname_by_username(username):
     conn, cur = connect_db()
 
-    cur.execute('SELECT instagram_nickname FROM users WHERE username = ?', (username.lower(),))
+    cur.execute('SELECT instagram_nickname FROM users WHERE username = ?', (username,))
     result = cur.fetchone()
 
     conn.close()

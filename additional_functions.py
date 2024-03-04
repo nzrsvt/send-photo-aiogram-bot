@@ -49,7 +49,7 @@ async def download_and_process_photos(user_id):
     temp_folder = "temp"
 
     for user in users:
-        if await get_folder_size(temp_folder) > 500 * 1024 * 1024: 
+        if await get_folder_size(temp_folder) > 100 * 1024 * 1024: 
                 await archive_and_send(temp_folder, archive_number, user_id)
                 archive_number = archive_number + 1
 
