@@ -72,7 +72,10 @@ def register_handlers(dp : Dispatcher):
 
 
     dp.register_callback_query_handler(add_admin_command, lambda c: c.data == 'add_admin_cb', state=None)
-    dp.register_message_handler(process_username, state=AdminAdding.username)
+    dp.register_message_handler(process_username_add, state=AdminAdding.username)
+
+    dp.register_callback_query_handler(remove_admin_command, lambda c: c.data == 'remove_admin_cb', state=None)
+    dp.register_message_handler(process_username_remove, state=AdminRemoving.username)
 
     dp.register_callback_query_handler(user_list_command, lambda c: c.data == 'user_list_cb')
 
