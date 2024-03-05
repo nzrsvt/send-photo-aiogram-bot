@@ -21,12 +21,16 @@ async def add_admin_command(callback : types.CallbackQuery):
     await AdminAdding.username.set()
     await remove_previous_kb(callback)
     await callback.message.answer("Введіть ім'я користувача якому потрібно надати права адміністратора: (наприклад @nzrsvt)")
+    await callback.message.answer('* Ви можете скасувати обрану дію, написавши "скасувати"')
     await callback.answer() 
 
 async def remove_admin_command(callback : types.CallbackQuery):
     await AdminRemoving.username.set()
     await remove_previous_kb(callback)
-    await callback.message.answer("Введіть ім'я користувача в якого потрібно забрати права адміністратора: (формату @username))")
+    await callback.message.answer("Введіть ім'я користувача в якого потрібно забрати права адміністратора: (формату @username)")
+    await callback.message.answer("Список адміністраторів: ")
+    await user_list_command(callback=callback, admin_only=True)
+    await callback.message.answer('* Ви можете скасувати обрану дію, написавши "скасувати"')
     await callback.answer() 
 
 async def process_username_add(message: types.Message, state: FSMContext):
@@ -77,9 +81,9 @@ async def process_username_remove(message: types.Message, state: FSMContext):
         await message.answer(f"⚠️ Виникла помилка {e} при обробці запиту.")
         await state.finish()
     
-async def user_list_command(callback : types.CallbackQuery):
+async def user_list_command(callback : types.CallbackQuery, admin_only=False):
     await remove_previous_kb(callback) 
-    users = db.get_all_users()
+    users = db.get_all_users() if not admin_only else db.get_all_admins()
     if users:
         user_list = ""
         for user in users:
@@ -90,13 +94,15 @@ async def user_list_command(callback : types.CallbackQuery):
         await callback.message.answer(user_list)
     else:
         await callback.message.answer("❌ Неможливо отримати список користувачів.")
-    await callback.message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
-    await callback.answer()
+    if not admin_only:
+        await callback.message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
+        await callback.answer()
 
 async def select_user_command(callback : types.CallbackQuery):
     await UserSelecting.username.set()
     await remove_previous_kb(callback)
     await callback.message.answer("Введіть Telegram-ім'я користувача фотографії якого потрібно переглянути: (формату @username)")
+    await callback.message.answer('* Ви можете скасувати обрану дію, написавши "скасувати"')
     await callback.answer() 
 
 async def send_user_photos(message: types.Message, state: FSMContext):

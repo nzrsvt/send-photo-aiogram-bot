@@ -24,9 +24,12 @@ async def enter_instagram_nickname_command(callback : types.CallbackQuery):
     if callback.data == 'enter_instagram_cb':
         await InstagramEntering.instagram_nickname.set()
     else:
+        is_existing_user = True
         await InstagramChanging.instagram_nickname.set()
     await remove_previous_kb(callback)
     await callback.message.answer("Введіть свій Instagram-нікнейм:")
+    if is_existing_user:
+        await callback.message.answer('* Ви можете скасувати обрану дію, написавши "скасувати"')
     await callback.answer() 
 
 async def process_instagram_nickname(message: types.Message, state: FSMContext):
@@ -51,6 +54,7 @@ async def send_photo_command(callback : types.CallbackQuery):
     await remove_previous_kb(callback)
     await PhotoSending.photo.set()
     await callback.message.answer("Надішліть свою фотографію: (одну або декілька)")
+    await callback.message.answer('* Ви можете скасувати обрану дію, написавши "скасувати"')
     await callback.answer()
 
 async def process_photo(message: types.Message, state: FSMContext):

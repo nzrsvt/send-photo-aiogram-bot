@@ -86,6 +86,16 @@ def get_all_users():
 
     return all_users
 
+def get_all_admins():
+    conn, cur = connect_db()
+
+    cur.execute('SELECT * FROM users WHERE is_admin = True')
+    all_admins = cur.fetchall()
+
+    conn.close()
+
+    return all_admins
+
 def set_as_admin(username):
     conn, cur = connect_db()
 
