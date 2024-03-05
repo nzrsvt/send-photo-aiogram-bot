@@ -135,6 +135,25 @@ async def send_user_photos(message: types.Message, state: FSMContext):
         await message.answer(f"⚠️ Виникла помилка {e} при обробці запиту.")
         await state.finish()
 
+async def remove_photos_command(callback : types.CallbackQuery):
+    await remove_previous_kb(callback)
+    await callback.message.answer("Всі фотографії, завантажені користувачами, буде безповоротно видалено. Підтвердити видалення фотографій?", reply_markup=admin_kb.submit_kb)
+    await callback.answer() 
+
+async def remove_photos_confirm_command(callback : types.CallbackQuery):
+    await remove_previous_kb(callback)
+    global is_archiving_photos
+    if is_archiving_photos:
+        await callback.message.answer('❌ Зачекайте, хтось викликав формування архіву з фотографіями.')
+    else:
+        if db.is_photos_table_empty():
+            await callback.message.answer("❌ Жоден з користувачів не завантажив фотографію.")
+        else:
+            db.delete_all_photos()
+            await callback.message.answer("✅ Всі фотографії, завантажені користувачами, видалено успішно!")
+    await callback.message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
+    await callback.answer()  
+
 is_archiving_photos = False
 async def download_photos_command(callback : types.CallbackQuery):
     global is_archiving_photos
@@ -142,7 +161,9 @@ async def download_photos_command(callback : types.CallbackQuery):
         await callback.message.answer('❌ Зачекайте, хтось вже викликав формування архіву з фотографіями.')
     else:
         is_archiving_photos = True
+        await callback.message.answer('⌛️ Розпочався процес формування архіву з фотографіями...')
         res = await download_and_process_photos(callback.from_user.id)
+        await callback.message.answer("✅ Всі фотографії, завантажені користувачами, завантажено успішно!")
         is_archiving_photos = False
     await remove_previous_kb(callback) 
     if res == -1:

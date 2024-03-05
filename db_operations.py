@@ -208,3 +208,21 @@ def get_file_ids_by_user_id(user_id):
     conn.close()
 
     return file_ids
+
+def delete_all_photos():
+    conn, cur = connect_db()
+
+    cur.execute('DELETE FROM photos')
+
+    conn.commit()
+    conn.close()
+
+def is_photos_table_empty():
+    conn, cur = connect_db()
+
+    cur.execute('SELECT COUNT(*) FROM photos')
+    count = cur.fetchone()[0]
+
+    conn.close()
+
+    return count == 0

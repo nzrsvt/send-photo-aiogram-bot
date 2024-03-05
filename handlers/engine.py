@@ -34,24 +34,21 @@ async def start_command(message: types.Message):
         )
 
 async def menu_call(callback : types.CallbackQuery):
-    if callback.data == "start_cb":
-        if db.check_user_instagram_existence(callback.from_user.id):
-            is_admin = db.check_is_admin(callback.from_user.id)
-            await callback.message.answer('🔸 Оберіть наступну дію:',
-                                          reply_markup = admin_kb.action_choose_kb if is_admin 
-                                          else user_kb.action_choose_kb
-                                          )
-        else:
-            await callback.message.answer('⬇️ Для початку роботи з ботом потрібно вказати свій Instagram-нікнейм. Натисніть на кнопку нижче.',reply_markup=user_kb.enter_instagram_kb)
+    if db.check_user_instagram_existence(callback.from_user.id):
+        is_admin = db.check_is_admin(callback.from_user.id)
+        await callback.message.answer('🔸 Оберіть наступну дію:',
+                                        reply_markup = admin_kb.action_choose_kb if is_admin 
+                                        else user_kb.action_choose_kb
+                                        )
     else:
-        await callback.message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+        await callback.message.answer('⬇️ Для початку роботи з ботом потрібно вказати свій Instagram-нікнейм. Натисніть на кнопку нижче.',reply_markup=user_kb.enter_instagram_kb)
     await remove_previous_kb(callback)
     await callback.answer()
 
 def register_handlers(dp : Dispatcher):
     dp.register_message_handler(start_command, commands=['start', 'help'])
 
-    dp.register_callback_query_handler(menu_call, lambda c: c.data in ['start_cb', 'return_to_menu_cb'])
+    dp.register_callback_query_handler(menu_call, lambda c: c.data in ['start_cb', 'return_to_menu_cb', 'cancel_cb'])
 
     dp.register_callback_query_handler(enter_instagram_nickname_command, lambda c: c.data in ['enter_instagram_cb', 'change_instagram_cb'], state=None)
 
@@ -83,3 +80,6 @@ def register_handlers(dp : Dispatcher):
 
     dp.register_callback_query_handler(select_user_command, lambda c: c.data == 'select_user_cb', state=None)
     dp.register_message_handler(send_user_photos, state=UserSelecting.username)
+
+    dp.register_callback_query_handler(remove_photos_command, lambda c: c.data == 'remove_photos_cb')
+    dp.register_callback_query_handler(remove_photos_confirm_command, lambda c: c.data == 'confirm_cb')
