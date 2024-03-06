@@ -4,6 +4,10 @@ from create_bot import dp
 from db_operations import create_users_table, create_photos_table
 import os
 
+from loguru import logger
+
+logger.add("logs/logs_{time}.log", rotation="1 MB")
+
 async def onStartup(_):
 
     create_users_table()

@@ -55,8 +55,9 @@ async def process_username_add(message: types.Message, state: FSMContext):
         await state.finish()
     except Exception as e:
         await message.answer(f"⚠️ Виникла помилка {e} при обробці запиту.")
+        await message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)
         await state.finish()
-    
+
 async def process_username_remove(message: types.Message, state: FSMContext):
     try:
         if message.entities:
@@ -157,15 +158,16 @@ async def remove_photos_confirm_command(callback : types.CallbackQuery):
 is_archiving_photos = False
 async def download_photos_command(callback : types.CallbackQuery):
     global is_archiving_photos
+    await remove_previous_kb(callback) 
     if is_archiving_photos:
         await callback.message.answer('❌ Зачекайте, хтось вже викликав формування архіву з фотографіями.')
+        res = 0
     else:
         is_archiving_photos = True
         await callback.message.answer('⌛️ Розпочався процес формування архіву з фотографіями...')
         res = await download_and_process_photos(callback.from_user.id)
         await callback.message.answer("✅ Всі фотографії, завантажені користувачами, завантажено успішно!")
         is_archiving_photos = False
-    await remove_previous_kb(callback) 
     if res == -1:
          await callback.message.answer('❌ Жоден з користувачів не завантажив фотографію.')
     await callback.message.answer('🔸 Оберіть наступну дію:', reply_markup=admin_kb.action_choose_kb)

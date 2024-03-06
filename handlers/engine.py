@@ -7,6 +7,7 @@ from aiogram.dispatcher.filters import MediaGroupFilter
 
 from handlers.user_actions import * 
 from handlers.admin_actions import * 
+from handlers.errors_handler import errors_handler
 
 from additional_functions import cancel_command, secret_command
 from config import secret_word
@@ -46,6 +47,8 @@ async def menu_call(callback : types.CallbackQuery):
     await callback.answer()
 
 def register_handlers(dp : Dispatcher):
+    dp.register_errors_handler(errors_handler)
+
     dp.register_message_handler(start_command, commands=['start', 'help'])
 
     dp.register_callback_query_handler(menu_call, lambda c: c.data in ['start_cb', 'return_to_menu_cb', 'cancel_cb'])
