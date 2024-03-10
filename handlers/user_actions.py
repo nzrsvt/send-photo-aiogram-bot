@@ -22,6 +22,7 @@ class PhotoSending(StatesGroup):
 
 async def enter_instagram_nickname_command(callback : types.CallbackQuery):
     if callback.data == 'enter_instagram_cb':
+        is_existing_user = False
         await InstagramEntering.instagram_nickname.set()
     else:
         is_existing_user = True
@@ -41,14 +42,16 @@ async def process_instagram_nickname(message: types.Message, state: FSMContext):
         else:
             instagram_nickname = message.text
         db.update_user_instagram(message.chat.id, instagram_nickname)
-        await state.finish()
         await message.answer(f"✅ {message.from_user.full_name}, нікнейм '{instagram_nickname}' збережено успішно!")
         await message.answer('🔸 Оберіть наступну дію:', reply_markup=user_kb.action_choose_kb)
-
-    except Exception as e:
-        await message.answer("⚠️ Виникла помилка при обробці запиту.")
+    except:
+        await message.answer("⚠️ Виникла помилка при обробці вашого повідомлення.")
+        if db.check_user_instagram_existence(message.chat.id):
+            await message.answer('🔸 Оберіть наступну дію:', reply_markup=user_kb.action_choose_kb)
+        else:
+            await message.answer('⬇️ Для початку роботи з ботом потрібно вказати свій Instagram-нікнейм. Натисніть на кнопку нижче.',reply_markup=user_kb.enter_instagram_kb)
+    finally:
         await state.finish()
-        await message.answer('⬇️ Для початку роботи з ботом потрібно вказати свій Instagram-нікнейм. Натисніть на кнопку нижче.',reply_markup=user_kb.enter_instagram_kb)
         
 async def send_photo_command(callback : types.CallbackQuery):
     await remove_previous_kb(callback)
@@ -59,15 +62,15 @@ async def send_photo_command(callback : types.CallbackQuery):
 
 async def process_photo(message: types.Message, state: FSMContext):
     success = await check_photo(message, state)
+
     if success == 0:
         await message.answer("💾 Фотографію збережено.")
-        await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
     elif success == 1:
         await message.answer("🚫 Розмір фотографії перевищує 2МБ.")
-        await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
     elif success == 2:
         await message.answer("🚫 Будь ласка, надішліть фотографію в іншому форматі.")
-        await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+
+    await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
     await state.finish()  
 
 @media_group_handler()
@@ -77,14 +80,12 @@ async def process_photo_group(messages: List[types.Message], state: FSMContext):
         if success != 0:
             if success == 1:
                 await message.answer("🚫 Розмір фотографії перевищує 2МБ.")
-                await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
             elif success == 2:
                 await message.answer("🚫 Будь ласка, надішліть фотографію в іншому форматі.")
-                await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
             break
     if success == 0:
         await message.answer("💾 Фотографії збережено.")
-        await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
+    await message.answer('🔸 Оберіть наступну дію:',reply_markup=user_kb.action_choose_kb)
     await state.finish() 
 
 # return values: 0 = saved, 1 = too large, 2 = wrong format
