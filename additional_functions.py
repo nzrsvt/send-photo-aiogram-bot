@@ -6,6 +6,9 @@ from keyboards import user_kb, admin_kb
 import db_operations as db
 import os
 import shutil
+from urllib.parse import urlparse
+
+import magic
 
 async def remove_previous_kb(callback: types.CallbackQuery):
     try:
@@ -70,6 +73,7 @@ async def download_and_process_photos(user_id):
                     file.write(downloaded_file.read())
     
     if os.path.exists(temp_folder) and os.path.isdir(temp_folder):
+        await check_files_type(temp_folder)
         await archive_and_send(temp_folder, archive_number, user_id)
         shutil.rmtree(temp_folder)
     else: 
@@ -93,3 +97,19 @@ async def archive_and_send(temp_folder, archive_number, user_id):
     os.remove(f"{archive_path}.zip")
     shutil.rmtree(temp_folder)
     os.makedirs(temp_folder, exist_ok=True)
+
+async def detect_file_type(file_path):
+    mime = magic.Magic(mime=True)
+    file_type = mime.from_file(file_path)
+    return file_type
+
+async def check_files_type(directory):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            filename, file_extension = os.path.splitext(file_path)
+            if not file_extension:
+                new_extension = await detect_file_type(file_path)
+                new_extension = new_extension.split('/')[-1]
+                new_filename = f"{filename}.{new_extension}"
+                os.rename(file_path, new_filename)
