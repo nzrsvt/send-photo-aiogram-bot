@@ -73,7 +73,6 @@ async def download_and_process_photos(user_id):
                     file.write(downloaded_file.read())
     
     if os.path.exists(temp_folder) and os.path.isdir(temp_folder):
-        await check_files_type(temp_folder)
         await archive_and_send(temp_folder, archive_number, user_id)
         shutil.rmtree(temp_folder)
     else: 
@@ -88,6 +87,8 @@ async def get_folder_size(folder_path):
     return total_size
 
 async def archive_and_send(temp_folder, archive_number, user_id):
+    await check_files_type(temp_folder)
+    
     archive_path = f"archive_{archive_number}"
     shutil.make_archive(archive_path, 'zip', temp_folder)
 
